@@ -1,4 +1,6 @@
+const Product = require('../../models/productModels.js');
 const User = require('../../models/userModels.js');
+const Variant = require('../../models/variantModels.js');
 
 async function secureUpload(req, res, next) {
 
@@ -29,8 +31,56 @@ async function secureUpload(req, res, next) {
 
 }
 
-async function createProduct(req, res){
-    console.log("Let's create product");
+async function createProduct(req, res) {
+
+    const { name, description, image, store } = req.body;
+
+    if (!name) {
+        return res.send({ error: 'Name is required!' });
+    } else if (!description) {
+        return res.send({ error: 'Description is required!' });
+    } else if (!image) {
+        return res.send({ error: 'Image is required!' });
+    } else if (!store) {
+        return res.send({ error: 'Store is required!' });
+    } else {
+
+        const product = new Product({
+
+            name,
+            description,
+            image,
+            store
+
+        });
+
+        product.save();
+
+        res.send({ success: 'Product is created successfully!' })
+
+    }
+
 }
 
-module.exports = { secureUpload, createProduct };
+
+async function createVariant(req, res) {
+
+    const { name, image, product } = req.body;
+
+    const variant = new Variant({
+
+        name,
+        image,
+        product
+
+    });
+
+    variant.save();
+
+    await Product.findOneAndUpdate({ _id: variant.product }, { $push: { variants: variant._id } }, { new: true });
+
+    res.send({ success: 'Variant is created successfully!' })
+
+}
+
+module.exports = { secureUpload, createProduct, createVariant };
