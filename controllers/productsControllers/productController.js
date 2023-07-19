@@ -2,6 +2,8 @@ const Product = require('../../models/productModels.js');
 const User = require('../../models/userModels.js');
 const Variant = require('../../models/variantModels.js');
 
+
+
 async function secureUpload(req, res, next) {
 
 
@@ -33,14 +35,12 @@ async function secureUpload(req, res, next) {
 
 async function createProduct(req, res) {
 
-    const { name, description, image, store } = req.body;
+    const { name, description, store } = req.body;
 
     if (!name) {
         return res.send({ error: 'Name is required!' });
     } else if (!description) {
         return res.send({ error: 'Description is required!' });
-    } else if (!image) {
-        return res.send({ error: 'Image is required!' });
     } else if (!store) {
         return res.send({ error: 'Store is required!' });
     } else {
@@ -49,7 +49,6 @@ async function createProduct(req, res) {
 
             name,
             description,
-            image,
             store
 
         });
@@ -65,13 +64,19 @@ async function createProduct(req, res) {
 
 async function createVariant(req, res) {
 
-    const { name, image, product } = req.body;
+    const { color, image, product, storage, ram, size, price, quantity } = req.body;
+
 
     const variant = new Variant({
 
-        name,
-        image,
-        product
+        color,
+        image : `${process.env.IMAGE_PATH}/uploads/${req.file.filename}`,
+        product,
+        storage,
+        ram,
+        size,
+        price,
+        quantity
 
     });
 
